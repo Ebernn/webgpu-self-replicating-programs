@@ -21,9 +21,9 @@ async function createSimulation(
       GPUBufferUsage.COPY_DST,
   });
 
-  // ✅ Create Head Positions Buffer (head0, head1)
+  // ✅ Create Head Positions Buffer (head0, head1) + Instruction Pointer
   const headBuffer = device.createBuffer({
-    size: programs * 2 * 4, // Two uint32 per program
+    size: programs * 3 * 4, // Three uint32 per program
     usage:
       GPUBufferUsage.STORAGE |
       GPUBufferUsage.COPY_SRC |
@@ -69,6 +69,7 @@ async function createSimulation(
         };
         
         struct Heads {
+            instructionPointer: u32,
             head0: u32,
             head1: u32,
         };
@@ -81,10 +82,11 @@ async function createSimulation(
             let idx = id.x;
             if (idx >= ${programs}u) { return; }
 
+            let instructionPointer = heads[idx].instructionPointer;
             var head0 = heads[idx].head0;
             var head1 = heads[idx].head1;
             
-            let instruction = tapes.data[idx * ${tapeSize}u + head0];
+            let instruction = tapes.data[idx * ${tapeSize}u + instructionPointer];
 
             switch (instruction) {
                 case 60u: { // '<' (Move head0 left)
@@ -125,6 +127,7 @@ async function createSimulation(
             }
 
             // ✅ Store updated heads
+            heads[idx].instructionPointer = (instructionPointer + 1u) % ${tapeSize}u;
             heads[idx].head0 = head0;
             heads[idx].head1 = head1;
         }

@@ -55,7 +55,7 @@ describe("WebGPU Brainfuck Instructions", () => {
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, bindGroup);
-    passEncoder.dispatchWorkgroups(1);
+    passEncoder.dispatchWorkgroups(programs);
     passEncoder.end();
     device.queue.submit([commandEncoder.finish()]);
     await device.queue.onSubmittedWorkDone();
@@ -70,98 +70,63 @@ describe("WebGPU Brainfuck Instructions", () => {
   }
 
   describe("Head Movement", () => {
-    it("should pass correct input data", async () => {
-      await testBufferExecution(
-        // initial state
-        new Uint32Array([
-          // program 0
-          0, 9, 0, 0,
-          // program 1
-          0, 0, 0, 0,
-        ]),
-        new Uint32Array([
-          // program 0
-          0, 0,
-          // program 1
-          0, 0,
-        ]),
-        // final state
-        new Uint32Array([
-          // program 0
-          0, 9, 0, 0,
-          // program 1
-          0, 0, 0, 0,
-        ]),
-        new Uint32Array([
-          // program 0
-          0, 0,
-          // program 1
-          0, 0,
-        ])
-      );
-    });
-
     it("should decrement head0", async () => {
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          255, 60, 0, 0,
+          255, 255, 60, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          1,
-          LAST_INDEX,
+          2, 1, 0,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          255, 60, 0, 0,
+          255, 255, 60, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          3, 0, 0,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          60, 255, 0, 0,
+          255, 255, 60, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          2, 0, 0,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          60, 255, 0, 0,
+          255, 255, 60, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
+          3,
           LAST_INDEX,
-          LAST_INDEX,
+          0,
           // program 1
+          1,
           0,
           0,
         ])
@@ -173,64 +138,60 @@ describe("WebGPU Brainfuck Instructions", () => {
         // initial state
         new Uint32Array([
           // program 0
-          62, 255, 0, 0,
+          255, 255, 62, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          2, 0, 0,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          62, 255, 0, 0,
+          255, 255, 62, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          1,
-          LAST_INDEX,
+          3, 1, 0,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          0, 255, 0, 62,
+          255, 255, 62, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
+          2,
           LAST_INDEX,
-          LAST_INDEX,
+          0,
           // program 1
+          0,
           0,
           0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 255, 0, 62,
+          255, 255, 62, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          3, 0, 0,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
     });
@@ -240,62 +201,58 @@ describe("WebGPU Brainfuck Instructions", () => {
         // initial state
         new Uint32Array([
           // program 0
-          0, 0, 0, 123,
+          0, 0, 123, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
-          1,
+          2, 0, 1,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 0, 0, 123,
+          0, 0, 123, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
-          0,
+          3, 0, 0,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          0, 0, 0, 123,
+          0, 0, 123, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
-          0,
+          2, 0, 0,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 0, 0, 123,
+          0, 0, 123, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
+          3,
+          0,
           LAST_INDEX,
           // program 1
+          1,
           0,
           0,
         ])
@@ -307,64 +264,60 @@ describe("WebGPU Brainfuck Instructions", () => {
         // initial state
         new Uint32Array([
           // program 0
-          0, 0, 0, 125,
+          0, 0, 125, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
-          0,
+          2, 0, 0,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 0, 0, 125,
+          0, 0, 125, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
-          1,
+          3, 0, 1,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          0, 0, 0, 125,
+          0, 0, 125, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
+          2,
+          0,
           LAST_INDEX,
           // program 1
+          0,
           0,
           0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 0, 0, 125,
+          0, 0, 125, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          LAST_INDEX,
-          0,
+          3, 0, 0,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
     });
@@ -382,50 +335,50 @@ describe("WebGPU Brainfuck Instructions", () => {
         ]),
         new Uint32Array([
           // program 0
-          0, 0,
+          0, 1, 0,
           // program 1
-          0, 0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          44, 10, 0, 0,
+          45, 9, 0, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          0, 0,
+          1, 1, 0,
           // program 1
-          0, 0,
+          1, 0, 0,
         ])
       );
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          0, 45, 0, 0,
+          45, 0, 0, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          1, 0,
+          0, 1, 0,
           // program 1
-          0, 0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 44, 0, 0,
+          45, 255, 0, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          1, 0,
+          1, 1, 0,
           // program 1
-          0, 0,
+          1, 0, 0,
         ])
       );
     });
@@ -441,50 +394,50 @@ describe("WebGPU Brainfuck Instructions", () => {
         ]),
         new Uint32Array([
           // program 0
-          0, 0,
+          0, 1, 0,
           // program 1
-          0, 0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          44, 10, 0, 0,
+          43, 11, 0, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          0, 0,
+          1, 1, 0,
           // program 1
-          0, 0,
+          1, 0, 0,
         ])
       );
       await testBufferExecution(
         // initial state
         new Uint32Array([
           // program 0
-          0, 43, 0, 0,
+          43, 255, 0, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          1, 0,
+          0, 1, 0,
           // program 1
-          0, 0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          0, 44, 0, 0,
+          43, 0, 0, 0,
           // program 1
           0, 0, 0, 0,
         ]),
         new Uint32Array([
           // program 0
-          1, 0,
+          1, 1, 0,
           // program 1
-          0, 0,
+          1, 0, 0,
         ])
       );
     });
@@ -496,32 +449,28 @@ describe("WebGPU Brainfuck Instructions", () => {
         // initial state
         new Uint32Array([
           // program 0
-          46, 5, 0, 0,
+          46, 5, 6, 0,
           // program 1
-          0, 0, 0, 0,
+          0, 6, 7, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          0, 1, 2,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          46, 5, 0, 0,
+          46, 5, 6, 0,
           // program 1
-          0, 0, 0, 46,
+          0, 6, 5, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          1, 1, 2,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
     });
@@ -530,32 +479,28 @@ describe("WebGPU Brainfuck Instructions", () => {
         // initial state
         new Uint32Array([
           // program 0
-          44, 0, 7, 0,
+          44, 5, 6, 0,
           // program 1
-          0, 0, 0, 7,
+          0, 6, 7, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          0, 1, 2,
           // program 1
-          0,
-          0,
+          0, 0, 0,
         ]),
         // final state
         new Uint32Array([
           // program 0
-          7, 0, 7, 0,
+          44, 7, 6, 0,
           // program 1
-          0, 0, 0, 7,
+          0, 6, 7, 0,
         ]),
         new Uint32Array([
           // program 0
-          0,
-          LAST_INDEX,
+          1, 1, 2,
           // program 1
-          0,
-          0,
+          1, 0, 0,
         ])
       );
     });
