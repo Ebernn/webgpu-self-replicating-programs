@@ -82,7 +82,7 @@ async function createSimulation(
             let idx = id.x;
             if (idx >= ${programs}u) { return; }
 
-            let instructionPointer = heads[idx].instructionPointer;
+            var instructionPointer = heads[idx].instructionPointer;
             var head0 = heads[idx].head0;
             var head1 = heads[idx].head1;
             
@@ -122,6 +122,36 @@ async function createSimulation(
                 case 44u: { // ',' (Copy head1 to head0)
                     let neighbor = (idx + 1u) % ${programs}u;
                     tapes.data[idx * ${tapeSize}u + head0] = tapes.data[neighbor * ${tapeSize}u + head1];
+                }
+                case 91u: { // '[' Jump forward if tape[head0] == 0
+                    if (tapes.data[idx * ${tapeSize}u + head0] == 0u) {
+                        var depth: u32 = 1u;
+                        while (depth > 0u) {
+                            if(instructionPointer >= ${tapeSize}u - 1u) {
+                                instructionPointer = 0u;
+                                break;
+                            }
+                            instructionPointer++;
+                            let nextInstruction = tapes.data[idx * ${tapeSize}u + instructionPointer];
+                            if (nextInstruction == 91u) { depth += 1u; }
+                            if (nextInstruction == 93u) { depth -= 1u; }
+                        }
+                    }
+                }
+                case 93u: { // ']' Jump backward if tape[head0] != 0
+                    if (tapes.data[idx * ${tapeSize}u + head0] != 0u) {
+                        var depth: u32 = 1u;
+                        while (depth > 0u) {
+                            if(instructionPointer == 0u) {
+                                instructionPointer = 0u;
+                                break;
+                            }
+                            instructionPointer--;
+                            let prevInstruction = tapes.data[idx * ${tapeSize}u + instructionPointer];
+                            if (prevInstruction == 93u) { depth += 1u; }
+                            if (prevInstruction == 91u) { depth -= 1u; }
+                        }
+                    }
                 }
                 default: {}
             }

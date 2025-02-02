@@ -505,4 +505,98 @@ describe("WebGPU Brainfuck Instructions", () => {
       );
     });
   });
+
+  describe("Jump Forward (`[`)", () => {
+    it("should jump forward to `]` when `tape[head0]` is 0", async () => {
+      await testBufferExecution(
+        // Initial tape: [ 91, 43, 93, 0, 0, 0, 0, 0 ] (`[+]`)
+        new Uint32Array([91, 43, 93, 0, 0, 0, 0, 0]),
+        new Uint32Array([
+          0, // IP = 0 (`[`)
+          3, // head0 = 3
+          0, // head1 = 0
+          0,
+          0,
+          0,
+        ]),
+        // Final tape: Unchanged
+        new Uint32Array([91, 43, 93, 0, 0, 0, 0, 0]),
+        // Expected head: Instruction pointer jumps past `]`
+        new Uint32Array([
+          3, // IP = 3 (past `]`)
+          3, // head0 = 3
+          0, // head1 = 0
+          1,
+          0,
+          0,
+        ])
+      );
+    });
+
+    it("should not jump forward if `tape[head0]` is not 0", async () => {
+      await testBufferExecution(
+        // Initial tape: [ 91, 43, 93, 0, 0, 0, 0, 0 ] (`[+]`)
+        new Uint32Array([91, 43, 93, 1, 0, 0, 0, 0]),
+        new Uint32Array([
+          0, // IP = 0 (`[`)
+          3, // head0 = 3
+          0, // head1 = 0
+          0,
+          0,
+          0,
+        ]),
+        // Final tape: Unchanged
+        new Uint32Array([91, 43, 93, 1, 0, 0, 0, 0]),
+        // Expected head: Instruction pointer just moves to next instruction
+        new Uint32Array([
+          1, // IP = 1 (inside loop)
+          3, // head0 = 3
+          0, // head1 = 0
+          1,
+          0,
+          0,
+        ])
+      );
+    });
+  });
+
+  describe("Jump Backward (`]`)", () => {
+    it("should jump back to `[` when tape[head0] is not 0", async () => {
+      await testBufferExecution(
+        // Initial tape: [ 91, 43, 93, 1, 0, 0, 0, 0 ] (`[+]`)
+        new Uint32Array([91, 43, 93, 1, 0, 0, 0, 0]),
+        new Uint32Array([
+          2, // IP = 2 (`]`)
+          3, // head0 = 3 (tape[head0] = 1)
+          0, // head1 = 0
+          0,
+          0,
+          0,
+        ]),
+        // Final tape: Unchanged
+        new Uint32Array([91, 43, 93, 1, 0, 0, 0, 0]),
+        // Expected head: IP jumps back to `[`
+        new Uint32Array([1, 3, 0, 1, 0, 0]) // IP = 1 (past `[`)
+      );
+    });
+
+    it("should not jump backward if tape[head0] is 0", async () => {
+      await testBufferExecution(
+        // Initial tape: [ 91, 43, 93, 0, 0, 0, 0, 0 ] (`[+]`)
+        new Uint32Array([91, 43, 93, 0, 0, 0, 0, 0]),
+        new Uint32Array([
+          2, // IP = 2 (`]`)
+          3, // head0 = 3 (tape[head0] = 0)
+          0, // head1 = 0
+          0,
+          0,
+          0,
+        ]),
+        // Final tape: Unchanged
+        new Uint32Array([91, 43, 93, 0, 0, 0, 0, 0]),
+        // Expected head: Instruction pointer just moves to next instruction
+        new Uint32Array([3, 3, 0, 1, 0, 0]) // IP = 3 (past `]`)
+      );
+    });
+  });
 });
