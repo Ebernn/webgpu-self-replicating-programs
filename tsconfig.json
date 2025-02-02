@@ -8,8 +8,15 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
+    "types": ["vite/client", "@webgpu/types"],
     "noEmit": true,
     "isolatedModules": true
-  }
+  },
+  "include": [
+    "./vite.config.ts",
+    "./vitest.config.ts",
+    "src/**/*",
+    "demo/**/*",
+    "scripts/**/*"
+  ]
 }
