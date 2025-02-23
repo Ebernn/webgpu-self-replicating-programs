@@ -62,6 +62,7 @@ async function createSimulation(
     bindGroupLayouts: [bindGroupLayout],
   });
 
+  const worldSize = Math.sqrt(programs);
   const shaderModule = device.createShaderModule({
     code: `
         struct Tape {
@@ -77,7 +78,7 @@ async function createSimulation(
         @group(0) @binding(0) var<storage, read_write> tapes: Tape;
         @group(0) @binding(1) var<storage, read_write> heads: array<Heads>;
 
-        @compute @workgroup_size(1)
+        @compute @workgroup_size(16)
         fn main(@builtin(global_invocation_id) id: vec3<u32>) {
             let idx = id.x;
             if (idx >= ${programs}u) { return; }
@@ -116,11 +117,83 @@ async function createSimulation(
                     else { tapes.data[idx * ${tapeSize}u + head0] = 0u; }
                 }
                 case 46u: { // '.' (Copy head0 to head1)
-                    let neighbor = (idx + 1u) % ${programs}u;
+                    let direction = (1u * tapes.data[(idx + 1u) * ${tapeSize}u - 1u]) % 4u;
+                    var neighbor = 0u;
+                    switch (direction) {
+                      case 0u: {
+                        if (idx % ${worldSize}u == ${
+      worldSize - 1
+    }u) { neighbor = idx - ${worldSize - 1}u; }
+                        else { neighbor = idx + 1u; }
+                        break;
+                      }
+                      case 1u: {
+                        if (idx % ${worldSize}u == 0u) { neighbor = idx + ${
+      worldSize - 1
+    }u; }
+                        else { neighbor = idx - 1u; }
+                        break;
+                      }
+                      case 2u: {
+                        if (idx < ${worldSize}u) { neighbor = idx + ${
+      programs - worldSize
+    }u; }
+                        else { neighbor = idx - ${worldSize}u; }
+                        break;
+                      }
+                      case 3u: {
+                        if (idx >= ${
+                          programs - worldSize
+                        }u) { neighbor = idx - ${programs - worldSize}u; }
+                        else { neighbor = idx + ${worldSize}u; }
+                        break;
+                      }
+                      default: {}
+                    }
+                    // let value = tapes.data[neighbor * ${tapeSize}u + head1];
+                    // if (value > 0u) { tapes.data[neighbor * ${tapeSize}u + head1] -= 1u; }
+                    // else { tapes.data[neighbor * ${tapeSize}u + head1] = 255u; }
+
                     tapes.data[neighbor * ${tapeSize}u + head1] = tapes.data[idx * ${tapeSize}u + head0];
                 }
                 case 44u: { // ',' (Copy head1 to head0)
-                    let neighbor = (idx + 1u) % ${programs}u;
+                    let direction = (1u * tapes.data[(idx + 1u) * ${tapeSize}u - 1u]) % 4u;
+                    var neighbor = 0u;
+                    switch (direction) {
+                      case 0u: {
+                        if (idx % ${worldSize}u == ${
+      worldSize - 1
+    }u) { neighbor = idx - ${worldSize - 1}u; }
+                        else { neighbor = idx + 1u; }
+                        break;
+                      }
+                      case 1u: {
+                        if (idx % ${worldSize}u == 0u) { neighbor = idx + ${
+      worldSize - 1
+    }u; }
+                        else { neighbor = idx - 1u; }
+                        break;
+                      }
+                      case 2u: {
+                        if (idx < ${worldSize}u) { neighbor = idx + ${
+      programs - worldSize
+    }u; }
+                        else { neighbor = idx - ${worldSize}u; }
+                        break;
+                      }
+                      case 3u: {
+                        if (idx >= ${
+                          programs - worldSize
+                        }u) { neighbor = idx - ${programs - worldSize}u; }
+                        else { neighbor = idx + ${worldSize}u; }
+                        break;
+                      }
+                      default: {}
+                    }
+                    // let value = tapes.data[neighbor * ${tapeSize}u + head1];
+                    // if (value < 255u) { tapes.data[neighbor * ${tapeSize}u + head1] += 1u; }
+                    // else { tapes.data[neighbor * ${tapeSize}u + head1] = 0u; }
+
                     tapes.data[idx * ${tapeSize}u + head0] = tapes.data[neighbor * ${tapeSize}u + head1];
                 }
                 case 91u: { // '[' Jump forward if tape[head0] == 0
@@ -158,6 +231,10 @@ async function createSimulation(
 
             // ✅ Store updated heads
             heads[idx].instructionPointer = (instructionPointer + 1u) % ${tapeSize}u;
+            // if(instructionPointer < ${tapeSize}u - 1u) {
+            //   heads[idx].instructionPointer = instructionPointer + 1u;
+            // }
+
             heads[idx].head0 = head0;
             heads[idx].head1 = head1;
         }
