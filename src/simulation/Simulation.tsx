@@ -64,18 +64,29 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
         props.tapeSize
       )} + subX;
           let instruction = tapeBuffer[tapeIndex];
+          let colorShift = 2.;
           switch (instruction) {
-            case 60u: {return vec4<f32>(180. / 255., 22. / 255., 22. / 255., 1.0);}
-            case 62u: {return vec4<f32>(22. / 255., 180. / 255., 22. / 255., 1.0);}
-            case 123u: {return vec4<f32>(115. / 255., 22. / 255., 22. / 255., 1.0);}
-            case 125u: {return vec4<f32>(22. / 255., 115. / 255., 22. / 255., 1.0);}
-            case 43u: {return vec4<f32>(22. / 255., 80. / 255., 180. / 255., 1.0);}
-            case 45u: {return vec4<f32>(22. / 255., 22. / 255., 22. / 255., 1.0);}
-            case 44u: {return vec4<f32>(180. / 255., 180. / 255., 22. / 255., 1.0);}
-            case 46u: {return vec4<f32>(140. / 255., 180. / 255., 22. / 255., 1.0);}
-            case 91u: {return vec4<f32>(200. / 255., 22. / 255., 200. / 255., 1.0);}
-            case 93u: {return vec4<f32>(180. / 255., 22. / 255., 200. / 255., 1.0);}
-            default: {return vec4<f32>(f32(instruction) / 255., f32(instruction) / 255., f32(instruction) / 255., 1.0);}
+            // '<' (Move head0 left)
+            case 60u: {return vec4<f32>(0. / 255., 64. / 255., 255. / 255., 1.0);}
+            // '>' (Move head0 right)
+            case 62u: {return vec4<f32>(colorShift / 255., 64. / 255., 255. / 255., 1.0);}
+            // '{' (Move head1 left)
+            case 123u: {return vec4<f32>(0. / 255., 64. / 255., 255. / 255., 1.0);}
+            // '}' (Move head1 right)
+            case 125u: {return vec4<f32>(0. / 255., (64. + colorShift) / 255., 255. / 255., 1.0);}
+            // '+' (Increment value at head0)
+            case 43u: {return vec4<f32>((192. + colorShift) / 255., 0. / 255., 192. / 255., 1.0);}
+            // '-' (Decrement value at head0)
+            case 45u: {return vec4<f32>(192. / 255., 0. / 255., 192. / 255., 1.0);}
+            // ',' (Copy head1 to head0)
+            case 44u: {return vec4<f32>((192. + colorShift) / 255., 0. / 255., 192. / 255., 1.0);}
+            // '.' (Copy head0 to head1)
+            case 46u: {return vec4<f32>(192. / 255., colorShift / 255., 192. / 255., 1.0);}
+            // '[' Jump forward if tape[head0] == 0
+            case 91u: {return vec4<f32>(0. / 255., 192. / 255., 0. / 255., 1.0);}
+            // ']' Jump backward if tape[head0] != 0
+            case 93u: {return vec4<f32>(colorShift / 255., 192. / 255., 0. / 255., 1.0);}
+            default: {return vec4<f32>(f32(instruction) / 1024., f32(instruction) / 1024., f32(instruction) / 1024., 1.0);}
           }
         }
       `,
@@ -102,17 +113,45 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
       programs: props.dimensions ** 2,
     });
     const commandEncoder = device.createCommandEncoder();
+    const initialTape = new Uint32Array(
+      Array.from({ length: 4 * props.tapeSize * props.dimensions ** 2 }, () =>
+        Math.floor(Math.random() * 256)
+      )
+    );
+
+    // const offset = 0;
+    // for (let i = 0; i < 30000; i++) {
+    //   initialTape[i * props.tapeSize + offset] = 91;
+    //   initialTape[i * props.tapeSize + offset + 1] = 91;
+    //   initialTape[i * props.tapeSize + offset + 2] = 123;
+    //   initialTape[i * props.tapeSize + offset + 3] = 46;
+    //   initialTape[i * props.tapeSize + offset + 4] = 62;
+    //   initialTape[i * props.tapeSize + offset + 5] = 93;
+    //   initialTape[i * props.tapeSize + offset + 6] = 45;
+    //   initialTape[i * props.tapeSize + offset + 7] = 93;
+
+    //   initialTape[i * props.tapeSize + offset + 10] = 91;
+    //   initialTape[i * props.tapeSize + offset + 11] = 91;
+    //   initialTape[i * props.tapeSize + offset + 12] = 123;
+    //   initialTape[i * props.tapeSize + offset + 13] = 46;
+    //   initialTape[i * props.tapeSize + offset + 14] = 62;
+    //   initialTape[i * props.tapeSize + offset + 15] = 93;
+    //   initialTape[i * props.tapeSize + offset + 16] = 45;
+    //   initialTape[i * props.tapeSize + offset + 17] = 93;
+    // }
+
+    // add extra symbols, random
+    const extraSymbols = [91, 123, 46, 62, 93, 45];
+    for (let i = 0; i < props.dimensions ** 2; i++) {
+      for (let j = 0; j < props.tapeSize; j++) {
+        const randomIndex = Math.floor(Math.random() * props.tapeSize);
+        initialTape[i * props.tapeSize + randomIndex] =
+          extraSymbols[Math.floor(Math.random() * extraSymbols.length)];
+      }
+    }
+
     commandEncoder.copyBufferToBuffer(
-      writeUint32ArrayToBuffer(
-        device,
-        // initial tape
-        new Uint32Array(
-          Array.from(
-            { length: 4 * props.tapeSize * props.dimensions ** 2 },
-            () => Math.floor(Math.random() * 128)
-          )
-        )
-      ),
+      writeUint32ArrayToBuffer(device, initialTape),
       0,
       tapeBuffer,
       0,
@@ -126,12 +165,13 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
       entries: [{ binding: 0, resource: { buffer: tapeBuffer } }],
     });
 
-    const simulate = () => {
+    const simulate = (batch = 100) => {
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginComputePass();
       passEncoder.setPipeline(simulationPipeline);
       passEncoder.setBindGroup(0, simulationBindGroup);
-      passEncoder.dispatchWorkgroups(props.dimensions ** 2);
+      for (let i = 0; i < batch; i++)
+        passEncoder.dispatchWorkgroups(props.dimensions ** 2 / 16);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
     };
@@ -172,7 +212,7 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
       ref={canvasRef}
       width={Math.sqrt(props.tapeSize) * props.dimensions}
       height={Math.sqrt(props.tapeSize) * props.dimensions}
-      class="w-full h-full"
+      class="w-full h-full pixelated"
     />
   );
 };
