@@ -120,7 +120,7 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
     );
 
     // const offset = 0;
-    // for (let i = 0; i < 30000; i++) {
+    // for (let i = 0; i < 1000; i++) {
     //   initialTape[i * props.tapeSize + offset] = 91;
     //   initialTape[i * props.tapeSize + offset + 1] = 91;
     //   initialTape[i * props.tapeSize + offset + 2] = 123;
@@ -141,7 +141,7 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
     // }
 
     // add extra symbols, random
-    const extraSymbols = [91, 123, 46, 62, 93, 45];
+    const extraSymbols = [91, 123, 46, 62, 93, 45, 94];
     for (let i = 0; i < props.dimensions ** 2; i++) {
       for (let j = 0; j < props.tapeSize; j++) {
         const randomIndex = Math.floor(Math.random() * props.tapeSize);
@@ -165,7 +165,7 @@ const SimulationCanvas: Component<SimulationCanvasProps> = (props) => {
       entries: [{ binding: 0, resource: { buffer: tapeBuffer } }],
     });
 
-    const simulate = (batch = 100) => {
+    const simulate = (batch = 1) => {
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginComputePass();
       passEncoder.setPipeline(simulationPipeline);
