@@ -11,8 +11,9 @@ describe("WebGPU Brainfuck Instructions", () => {
   let pipeline: GPUComputePipeline;
   let bindGroup: GPUBindGroup;
 
-  const tapeSize = 4;
-  const programs = 4;
+  const tapeSize = 2;
+  const universeSize = 2;
+  const numberOfPrograms = universeSize ** 2;
   beforeAll(async () => {
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) throw new Error("WebGPU not supported");
@@ -21,8 +22,8 @@ describe("WebGPU Brainfuck Instructions", () => {
 
     // prepare the simulation
     ({ tapeBuffer, bindGroup, pipeline } = await createSimulation(device, {
-      programs,
       tapeSize,
+      universeSize,
     }));
   });
 
@@ -44,7 +45,7 @@ describe("WebGPU Brainfuck Instructions", () => {
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, bindGroup);
-    passEncoder.dispatchWorkgroups(programs);
+    passEncoder.dispatchWorkgroups(numberOfPrograms);
     passEncoder.end();
     device.queue.submit([commandEncoder.finish()]);
     await device.queue.onSubmittedWorkDone();
