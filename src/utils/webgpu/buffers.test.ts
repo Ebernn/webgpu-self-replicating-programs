@@ -1,4 +1,4 @@
-import { describe, beforeAll, test, expect } from "vitest";
+import { describe, beforeAll, test, expect, afterAll } from "vitest";
 import {
   writeFloat32ArrayToBuffer,
   readFloat32ArrayFromBuffer,
@@ -39,4 +39,6 @@ describe("WebGPU Buffer Operations", () => {
     );
     expect(result).toEqual(inputData);
   });
+
+  afterAll(() => device.destroy());
 });
