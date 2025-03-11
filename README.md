@@ -1,34 +1,35 @@
-## Usage
+# 🧬 WebGPU Self-Replicating Programs
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+This project is a WebGPU implementation of "_Computational Life: How Well-formed, Self-replicating Programs Emerge from Simple Interaction_" by Google researchers Blaise Agüera y Arcas et al. ([📄 arXiv 2406.19108](https://arxiv.org/pdf/2406.19108)). The original study explores how initial chaos and simple rules can lead to the emergence of self-replicating structures—this implementation brings it to the browser.
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+## ✨ Features
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+- WebGPU Integration: Both the renderer and the simulation logic run on WebGPU. Each program is executed in parallel, so it runs smoothly in modern web browsers.​
+- Animated Visualization: Real-time graphical representation of the tape, showing how programs evolve and undergo natural selection.
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+## 🧐 Getting Started
 
-## Available Scripts
+### Prerequisites
 
-In the project directory, you can run:
+- A modern WebGPU-compatible browser (latest Chrome, Edge, or Safari).
+- Node.js & NPM (for local development).
 
-### `npm run dev` or `npm start`
+### Running the Simulation
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1.  Clone the Repository:
 
-The page will reload if you make edits.<br>
+    `git clone https://github.com/Ebernn/webgpu-self-replicating-programs.git`
 
-### `npm run build`
+2.  Install dependencies: `npm install`
+3.  Start the local server: `npm run start`
+4.  Visit `http://localhost:3000/` in your browser
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+## 🤝 Contributing
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+Contributions are welcome! If you find a bug or have an improvement, feel free to open an issue or submit a pull request. I'm still learning WebGPU! 🎓
 
-## Deployment
+## ⚖️ License
 
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+MIT – Do whatever you want. But if your self-replicating programs evolve into sentient AI, that’s on you 😂
+
+🔬 Shoutout to the authors of the paper for the cool experiment!

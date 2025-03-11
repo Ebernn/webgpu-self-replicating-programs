@@ -1,27 +1,15 @@
-import type { Component } from 'solid-js';
+import type { Component } from "solid-js";
+import styles from "./App.module.css";
+import SimulationCanvas from "./simulation/SimulationCanvas";
 
-import logo from './logo.svg';
-import styles from './App.module.css';
-
-const App: Component = () => {
-  return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/solidjs/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-      </header>
-    </div>
-  );
-};
+const App: Component = () => (
+  <div class={styles.App}>
+    <SimulationCanvas tapeSize={4} dimensions={256} />
+    {/* <SimulationCanvas tapeSize={6} dimensions={170} /> */}
+    {/* <SimulationCanvas tapeSize={8} dimensions={128} /> */}
+    {/* <SimulationCanvas tapeSize={12} dimensions={85} /> */}
+    {/* <SimulationCanvas tapeSize={16} dimensions={64} /> */}
+  </div>
+);
 
 export default App;
