@@ -118,7 +118,7 @@ fn fs_main(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     const extraSymbols = [60, 62, 123, 125, 43, 45, 44, 46, 91, 93];
     for (let i = 0; i < props.dimensions ** 2; i++)
       for (let j = 0; j < tapeLength; j++) {
-        // if (Math.random() < 0.8) continue;
+        if (Math.random() < 0.8) continue;
         const randomIndex = Math.floor(Math.random() * tapeLength);
         initialTape[i * tapeLength + randomIndex] =
           extraSymbols[Math.floor(Math.random() * extraSymbols.length)];
