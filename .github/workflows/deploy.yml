@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "dev/gh-pages"]
+    branches: ["*"] # Run tests on all branches
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,8 +21,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
+  # Job to run tests before deploying
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm run test
+
+  # Deploy job, only runs if tests pass
   deploy:
+    needs: test # Ensures tests pass before deploying
+    if: github.ref == 'refs/heads/main' # Deploy only from main
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
