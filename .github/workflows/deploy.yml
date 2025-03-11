@@ -1,5 +1,5 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Simple workflow for running tests on all branches and deploying only from main
+name: Test and Deploy to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
